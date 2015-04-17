@@ -1,3 +1,5 @@
+package vogi.mobpro.hslu.ch.schigg.business;
+
 /**
  * Created by tgdvoch5 on 17.04.2015.
  */
