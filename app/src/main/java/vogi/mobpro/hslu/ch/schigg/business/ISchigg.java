@@ -5,6 +5,7 @@ package vogi.mobpro.hslu.ch.schigg.business;
  */
 public interface ISchigg {
     int getID();
+    void setID(int id);
     String getWort();
     void setWort(String wort);
     String getBeschribig();
