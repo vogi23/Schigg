@@ -11,6 +11,8 @@ public class Schigg implements ISchigg {
     private String beschribig;
     private String plz;
 
+    public Schigg(){ }
+
     public Schigg(int id){
         this.id = id;
     }

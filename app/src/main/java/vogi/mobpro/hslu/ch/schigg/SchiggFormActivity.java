@@ -1,12 +1,17 @@
 package vogi.mobpro.hslu.ch.schigg;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
 
 public class SchiggFormActivity extends Activity {
+
+    private static final int SPECIAL_CHAR_REQUEST_CODE = 232323;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,5 +40,25 @@ public class SchiggFormActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void btn_specialChar(View v){
+        Intent intent = new Intent(this, SpecialCharActivity.class);
+        startActivityForResult(intent, SPECIAL_CHAR_REQUEST_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == SPECIAL_CHAR_REQUEST_CODE){
+            String specialChar = data.getStringExtra(SpecialCharActivity.SPECIAL_CHAR_EXTRA_KEY);
+            TextView textWort = (TextView) findViewById(R.id.newschiggWortInput);
+            textWort.setText(textWort.getText()+specialChar);
+        }
+    }
+
+    public void btn_save(View v){
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
 }

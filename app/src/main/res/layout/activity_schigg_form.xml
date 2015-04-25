@@ -7,10 +7,83 @@
     tools:context="vogi.mobpro.hslu.ch.schigg.SchiggFormActivity">
 
     <LinearLayout
+        android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">
 
+        <TextView
+            android:id="@+id/newschiggWortLabel"
+            android:text="Begriff"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#fff"/>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
 
+            <EditText
+                android:id="@+id/newschiggWortInput"
+                android:text="asdf"
+                android:layout_width="wrap_content"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1"
+                android:layout_height="30dp"
+                android:maxLines="1"
+                android:gravity="center_vertical"
+                android:textColor="#000"
+                android:background="#eee"/>
+            <Button
+                android:text="è"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="#f99"
+                android:onClick="btn_specialChar"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/newschiggBeschribigLabel"
+            android:text="Beschribig"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#fff"/>
+        <TextView
+            android:id="@+id/newschiggBeschribigInput"
+            android:text="asdf"
+            android:layout_width="fill_parent"
+            android:layout_height="30dp"
+            android:editable="true"
+            android:maxLines="1"
+            android:gravity="center_vertical"
+            android:textColor="#000"
+            android:background="#eee"/>
+
+        <TextView
+            android:id="@+id/newschiggPLZLabel"
+            android:text="PLZ"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#fff"/>
+        <TextView
+            android:id="@+id/newschiggPLZInput"
+            android:text="asdf"
+            android:layout_width="fill_parent"
+            android:layout_height="30dp"
+            android:editable="true"
+            android:maxLines="1"
+            android:gravity="center_vertical"
+            android:textColor="#000"
+            android:background="#eee"/>
+
+        <Button
+            android:text="Speichern"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:background="#eee"
+            android:textColor="#000"
+            android:layout_marginTop="20dp"
+            android:onClick="btn_save"/>
     </LinearLayout>
 
 </RelativeLayout>

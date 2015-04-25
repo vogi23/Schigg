@@ -3,7 +3,7 @@
     android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:background="@drawable/bg_gradient"
+    android:background="@drawable/bg_gradient" android:id="@+id/main_container"
     android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
 
     <TextView android:text="LOGO"
@@ -13,69 +13,7 @@
         android:layout_alignParentTop="true"
         android:background="#ccc"
         android:textColor="#f00"
-        android:id="@+id/textView" />
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView"
-        android:layout_above="@id/btn_add_wort"
-        android:layout_marginTop="10dp">
-
-        <Button
-            android:text="<"
-            android:layout_gravity="center"
-            android:layout_width="30dp"
-            android:layout_height="100dp" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_gravity="center_vertical"
-            android:paddingLeft="5dp"
-            android:paddingRight="5dp"
-            android:orientation="vertical">
-
-            <TextView android:text="Schigg"
-                android:layout_marginBottom="20dp"
-                android:textSize="40dp"
-                android:gravity="center"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:background="#ccc"
-                android:textColor="#f00"
-                android:id="@+id/main_wort" />
-
-            <TextView android:text="Ä chlini härzegi Dose mit fein schmöckendem Inhalt"
-                android:layout_width="fill_parent"
-                android:layout_height="80dp"
-                android:layout_marginBottom="10dp"
-                android:textSize="16dp"
-                android:gravity="center"
-                android:background="#ccc"
-                android:textColor="#f00"
-                android:id="@+id/main_beschribig" />
-
-            <TextView android:text="PLZ: 3673"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textSize="20dp"
-                android:background="#ccc"
-                android:textColor="#f00"
-                android:id="@+id/main_plz" />
-
-        </LinearLayout>
-
-        <Button
-            android:text=">"
-            android:layout_gravity="center"
-            android:layout_width="30dp"
-            android:layout_height="100dp" />
-
-    </LinearLayout>
+        android:id="@+id/main_logo" />
 
     <TextView
         android:id="@+id/btn_add_wort"
@@ -87,8 +25,89 @@
         android:padding="5dp"
         android:gravity="center"
         android:shadowColor="#000"
-        android:onClick="btn_new_wort()"
+        android:onClick="btn_newWort"
         android:layout_alignParentBottom="true"
         android:layout_height="30dp" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/main_logo"
+        android:layout_above="@id/btn_add_wort"
+        android:layout_marginTop="10dp">
+
+        <Button
+            android:id="@+id/btn_rotateRight"
+            android:text="&lt;"
+            android:layout_gravity="center"
+            android:layout_width="30dp"
+            android:layout_height="100dp"
+            android:onClick="btn_rotateRight"/>
+        <ProgressBar
+            android:id="@+id/progress_rotateRight"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:indeterminate="true" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:orientation="vertical">
+
+            <TextView android:text="Begriff"
+                android:layout_marginBottom="20dp"
+                android:textSize="40dp"
+                android:gravity="center"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="#ccc"
+                android:textColor="#f00"
+                android:id="@+id/schiggScrollerWort" />
+
+            <TextView android:text="Ä chlini härzegi Dose mit fein schmöckendem Inhalt"
+                android:layout_width="fill_parent"
+                android:layout_height="80dp"
+                android:layout_marginBottom="10dp"
+                android:textSize="16dp"
+                android:gravity="center"
+                android:background="#ccc"
+                android:textColor="#f00"
+                android:id="@+id/schiggScrollerBeschribig" />
+
+            <TextView android:text="PLZ: 3673"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20dp"
+                android:background="#ccc"
+                android:textColor="#f00"
+                android:id="@+id/schiggScrollerPLZ" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_rotateLeft"
+            android:text="&gt;"
+            android:layout_gravity="center"
+            android:layout_width="30dp"
+            android:layout_height="100dp"
+            android:onClick="btn_rotateLeft" />
+        <ProgressBar
+            android:id="@+id/progress_rotateLeft"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:indeterminate="true" />
+
+    </LinearLayout>
+
 
 </RelativeLayout>

@@ -1,7 +1,8 @@
 <resources>
-    <string name="app_name">Schigg</string>
+    <string name="app_name">App</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_schigg_form">SchiggFormActivity</string>
+    <string name="title_activity_special_char">SpecialCharActivity</string>
 </resources>
