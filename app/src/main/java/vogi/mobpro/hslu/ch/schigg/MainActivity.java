@@ -8,11 +8,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import vogi.mobpro.hslu.ch.schigg.business.ISchigg;
 import vogi.mobpro.hslu.ch.schigg.business.Schigg;
@@ -33,7 +35,14 @@ public class MainActivity extends Activity{
         SharedPreferences prefs = getPreferences(MODE_PRIVATE);
         this.actualSchiggIndex = prefs.getInt(PREF_KEY_ACTUAL_SCHIGG_ID, 0);
 
-        this.schiggList = new SchiggLinkedList(SchiggGenerator.generateSchiggs(5));
+        LocalSchiggCache cache = LocalSchiggCache.getInstance();
+        this.schiggList = cache.getCachedList();
+        if(this.schiggList == null){
+            Intent intent = new Intent(this, WelcomeActivity.class);
+            startActivity(intent);
+            return;
+        }
+
         this.schiggList.get(this.actualSchiggIndex);
         syncScrollerToList();
 
@@ -52,14 +61,22 @@ public class MainActivity extends Activity{
         });
     }
 
+
+
     private void rotateRight(){
         ISchigg schigg = schiggList.previous();
         if(schigg != null){
             syncScrollerToList();
         }else{
-            this.schiggList.addAll(SchiggGenerator.generateSchiggs(3));
+            Button buttonRight = (Button) findViewById(R.id.btn_rotateRight);
+            ProgressBar barRight = (ProgressBar) findViewById(R.id.progress_rotateRight);
+            buttonRight.setVisibility(View.GONE);
+            barRight.setVisibility(View.VISIBLE);
+            this.appendLeft(SchiggGenerator.generateSchiggs(3));
+            buttonRight.setVisibility(View.VISIBLE);
+            barRight.setVisibility(View.GONE);
+            schiggList.previous();
             syncScrollerToList();
-            Toast.makeText(this, "Left end of List reached, loading max 3 newer", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -68,9 +85,25 @@ public class MainActivity extends Activity{
         if(schigg != null){
             syncScrollerToList();
         }else{
-            Toast.makeText(this, "Right end of List reached, loading max 3 older", Toast.LENGTH_LONG).show();
+            Button buttonLeft = (Button) findViewById(R.id.btn_rotateLeft);
+            ProgressBar barLeft = (ProgressBar) findViewById(R.id.progress_rotateLeft);
+            buttonLeft.setVisibility(View.GONE);
+            barLeft.setVisibility(View.VISIBLE);
+            this.appendRight(SchiggGenerator.generateSchiggs(3));
+            buttonLeft.setVisibility(View.VISIBLE);
+            barLeft.setVisibility(View.GONE);
+            schiggList.next();
+            syncScrollerToList();
         }
     }
+
+    private void appendLeft(List<ISchigg> list){
+        schiggList.addAllLeft(list);
+    }
+    private void appendRight(List<ISchigg> list){
+        schiggList.addAllRight(list);
+    }
+
 
     private void syncScrollerToList(){
         ISchigg schigg = this.schiggList.current();

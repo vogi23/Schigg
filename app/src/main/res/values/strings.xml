@@ -5,4 +5,5 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_schigg_form">SchiggFormActivity</string>
     <string name="title_activity_special_char">SpecialCharActivity</string>
+    <string name="title_activity_welcome">WelcomeActivity</string>
 </resources>

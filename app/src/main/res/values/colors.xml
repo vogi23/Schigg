@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="bg_color_left">#00aa22</color>
-    <color name="bg_color_center">#dd1122</color>
-    <color name="bg_color_right">#00cc22</color>
+    <color name="bg_color_left">#ddd</color>
+    <color name="bg_color_right">#fafafa</color>
+    <color name="colorA">#e20909</color>
+    <color name="colorB">#fcef3c</color>
+    <color name="greyA">#aaa</color>
+    <color name="greyb">#ccc</color>
+    <color name="greyc">#eee</color>
+    <color name="blackA">#000</color>
+    <color name="blackB">#444</color>
+    <color name="blackC">#666</color>
 </resources>

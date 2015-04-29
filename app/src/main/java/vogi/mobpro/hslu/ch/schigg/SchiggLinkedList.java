@@ -16,8 +16,8 @@ public class SchiggLinkedList {
 
     public SchiggLinkedList(Collection<ISchigg> schiggs){
         this.list = new LinkedList<>();
-        this.addAll(schiggs);
         iterator = list.listIterator();
+        this.addAllLeft(schiggs);
         if(iterator.hasNext()){current = iterator.next();}
     }
 
@@ -67,8 +67,16 @@ public class SchiggLinkedList {
         return this.iterator.hasPrevious();
     }
 
-    public void addAll(Collection<ISchigg> newSchiggs){
+    public void addAllLeft(Collection<ISchigg> newSchiggs){
+        int pos = iterator.nextIndex();
         list.addAll(0, newSchiggs);
+        iterator = list.listIterator(pos+newSchiggs.size());
+    }
+
+    public void addAllRight(Collection<ISchigg> newSchiggs){
+        int pos = iterator.nextIndex();
+        list.addAll(newSchiggs);
+        iterator = list.listIterator(pos);
     }
 
     public void clear(){

@@ -69,7 +69,7 @@ public class SpecialCharActivity extends Activity implements AdapterView.OnItemC
     }
 
     public void setVariants(SpecialCharVariant[] items){
-        ArrayAdapter<SpecialCharVariant> adapter = new ArrayAdapter<SpecialCharVariant>(this, android.R.layout.simple_list_item_1, items);
+        ArrayAdapter<SpecialCharVariant> adapter = new ArrayAdapter<SpecialCharVariant>(this, R.layout.specialchar_list_item, items);
         ListView listView = (ListView) findViewById(R.id.specialCharListView);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(this);
@@ -103,8 +103,6 @@ public class SpecialCharActivity extends Activity implements AdapterView.OnItemC
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         SpecialCharVariant var = this.actCharArray[position];
-        Toast t = Toast.makeText(getBaseContext(), var.getHighligtedWord(), Toast.LENGTH_SHORT);
-        t.show();
         Intent intent = new Intent();
         intent.putExtra(SPECIAL_CHAR_EXTRA_KEY, var.getChar());
         setResult(RESULT_OK, intent);

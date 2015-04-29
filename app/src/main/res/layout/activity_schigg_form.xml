@@ -4,86 +4,91 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
+    android:background="@drawable/bg_gradient"
     tools:context="vogi.mobpro.hslu.ch.schigg.SchiggFormActivity">
 
+    <ImageView android:layout_width="fill_parent"
+        android:layout_height="100dp"
+        android:src="@drawable/header"
+        android:id="@+id/logo"
+        android:layout_marginBottom="20dp"/>
+
     <LinearLayout
+        android:layout_below="@id/logo"
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/newschiggWortLabel"
-            android:text="Begriff"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#fff"/>
+
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="fill_parent"
+            android:layout_marginBottom="20dp"
             android:layout_height="wrap_content">
 
             <EditText
                 android:id="@+id/newschiggWortInput"
-                android:text="asdf"
                 android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginRight="10dp"
+                android:layout_marginTop="5dp"
                 android:layout_weight="1"
-                android:layout_height="30dp"
                 android:maxLines="1"
+                android:textSize="26dp"
                 android:gravity="center_vertical"
-                android:textColor="#000"
-                android:background="#eee"/>
+                android:textColor="@color/colorA"
+                android:editable="true"
+                android:hint="Begriff"
+                android:inputType="text"
+                android:textColorHint="@color/greyA"
+                android:layout_gravity="top" />
             <Button
                 android:text="è"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:background="#f99"
+                android:layout_width="45dp"
+                android:layout_height="50dp"
+                android:layout_gravity="top"
+                android:textColor="@color/colorA"
+                android:background="@color/colorB"
                 android:onClick="btn_specialChar"/>
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/newschiggBeschribigLabel"
-            android:text="Beschribig"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#fff"/>
-        <TextView
+        <EditText
             android:id="@+id/newschiggBeschribigInput"
-            android:text="asdf"
-            android:layout_width="fill_parent"
-            android:layout_height="30dp"
-            android:editable="true"
-            android:maxLines="1"
-            android:gravity="center_vertical"
-            android:textColor="#000"
-            android:background="#eee"/>
-
-        <TextView
-            android:id="@+id/newschiggPLZLabel"
-            android:text="PLZ"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:textColor="#fff"/>
-        <TextView
-            android:id="@+id/newschiggPLZInput"
-            android:text="asdf"
-            android:layout_width="fill_parent"
-            android:layout_height="30dp"
+            android:layout_marginBottom="10dp"
+            android:layout_weight="1"
+            android:textSize="20dp"
+            android:gravity="top"
+            android:textColor="@color/greyA"
             android:editable="true"
-            android:maxLines="1"
-            android:gravity="center_vertical"
-            android:textColor="#000"
-            android:background="#eee"/>
+            android:hint="Beschreibung"
+            android:inputType="text"
+            android:textColorHint="@color/greyA"
+            android:layout_gravity="top" />
 
-        <Button
-            android:text="Speichern"
+        <EditText
+            android:id="@+id/newschiggPLZInput"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:background="#eee"
-            android:textColor="#000"
-            android:layout_marginTop="20dp"
-            android:onClick="btn_save"/>
+            android:layout_weight="1"
+            android:maxLines="1"
+            android:textSize="18dp"
+            android:gravity="top"
+            android:textColor="@color/greyA"
+            android:hint="PLZ / Ort"
+            android:inputType="text"
+            android:textColorHint="@color/greyA"
+            android:layout_gravity="top" />
+
     </LinearLayout>
+
+    <Button
+        android:text="Speichern"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_alignParentBottom="true"
+        android:onClick="btn_save"/>
 
 </RelativeLayout>
