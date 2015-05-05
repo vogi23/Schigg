@@ -1,6 +1,9 @@
 package vogi.mobpro.hslu.ch.schigg;
 
 /**
+ * Singleton that holds downloaded SchiggLinkedList during live-cycle of the app
+ * (even if MainActivity is destroyed()).
+ *
  * Created by tgdvoch5 on 28.04.2015.
  */
 public class LocalSchiggCache {

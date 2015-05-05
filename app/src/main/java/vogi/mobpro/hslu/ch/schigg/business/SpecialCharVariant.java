@@ -1,5 +1,8 @@
 package vogi.mobpro.hslu.ch.schigg.business;
 
+import android.text.Html;
+import android.text.Spanned;
+
 /**
  * Created by tgdvoch5 on 17.04.2015.
  */
@@ -12,7 +15,7 @@ public class SpecialCharVariant {
         this.theChar = replaceWithChar;
         for(String part : parts){
             if(part.equals(highlightChar)){
-                this.word += "<b>"+replaceWithChar+"</b>";
+                this.word += replaceWithChar;
             }else {
                 this.word += part;
             }

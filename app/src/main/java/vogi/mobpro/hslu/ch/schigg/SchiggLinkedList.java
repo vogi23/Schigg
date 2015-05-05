@@ -7,6 +7,8 @@ import java.util.ListIterator;
 import vogi.mobpro.hslu.ch.schigg.business.ISchigg;
 
 /**
+ * Sortierte Liste mit Schiggs durch welche im Scroller auf der MainActivity gescrollt wird.
+ *
  * Created by tgdvoch5 on 18.04.2015.
  */
 public class SchiggLinkedList {
@@ -30,6 +32,11 @@ public class SchiggLinkedList {
         return schigg;
     }
 
+    /**
+     * Returns next Schigg after current in List.
+     *
+     * @return
+     */
     public ISchigg next(){
         if(!iterator.hasNext()){
             return null;
@@ -43,6 +50,11 @@ public class SchiggLinkedList {
         }
     }
 
+    /**
+     * Returns previous Schigg before current in List.
+     *
+     * @return
+     */
     public ISchigg previous(){
         if(!iterator.hasPrevious()){
             return null;
@@ -59,6 +71,9 @@ public class SchiggLinkedList {
     public ISchigg current(){
         return current;
     }
+    public int currentIndex(){
+        return this.list.indexOf(current);
+    }
 
     public boolean hasNext(){
         return this.iterator.hasNext();
@@ -67,12 +82,26 @@ public class SchiggLinkedList {
         return this.iterator.hasPrevious();
     }
 
+    /**
+     * Adds Schiggs to to left end (newer) of the list.
+     *
+     * ListIterator is updated, so that next() + previous() will still stay up to date.
+     *
+     * @param newSchiggs
+     */
     public void addAllLeft(Collection<ISchigg> newSchiggs){
         int pos = iterator.nextIndex();
         list.addAll(0, newSchiggs);
         iterator = list.listIterator(pos+newSchiggs.size());
     }
 
+    /**
+     * Adds Schiggs to to right end (older) of the list.
+     *
+     * ListIterator is updated, so that next() + previous() will still stay up to date.
+     *
+     * @param newSchiggs
+     */
     public void addAllRight(Collection<ISchigg> newSchiggs){
         int pos = iterator.nextIndex();
         list.addAll(newSchiggs);

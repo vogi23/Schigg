@@ -3,6 +3,7 @@ package vogi.mobpro.hslu.ch.schigg;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.transition.Fade;
@@ -12,6 +13,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import vogi.mobpro.hslu.ch.schigg.business.ISchigg;
+import vogi.mobpro.hslu.ch.schigg.business.Schigg;
 
 
 public class SchiggFormActivity extends Activity {
@@ -28,6 +33,7 @@ public class SchiggFormActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schigg_form);
 
+        // Load last strings of EditText-Views
         prefs = getPreferences(MODE_PRIVATE);
         EditText wort = (EditText) findViewById(R.id.newschiggWortInput);
         EditText beschribig = (EditText) findViewById(R.id.newschiggBeschribigInput);
@@ -74,6 +80,13 @@ public class SchiggFormActivity extends Activity {
         startActivityForResult(intent, SPECIAL_CHAR_REQUEST_CODE);
     }
 
+    /**
+     * Callback from SpecialCharActivity - retrieves SpecialChar as String and append it to Wort.
+     *
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -84,10 +97,50 @@ public class SchiggFormActivity extends Activity {
         }
     }
 
+    /**
+     * onclick Callback of btn id/btn_save_schigg in activity_schigg_form layout.
+     * @param v
+     */
     public void btn_save(View v){
+        EditText wortText = (EditText) findViewById(R.id.newschiggWortInput);
+        EditText beschribigText = (EditText) findViewById(R.id.newschiggBeschribigInput);
+        EditText plzText = (EditText) findViewById(R.id.newschiggPLZInput);
+        ISchigg schigg = new Schigg();
+        schigg.setWort(wortText.getText().toString());
+        schigg.setWort(beschribigText.getText().toString());
+        schigg.setWort(plzText.getText().toString());
+
+        Toast toast = Toast.makeText(getApplicationContext(), "Beitrag wird hochgeladen...", Toast.LENGTH_SHORT);
+        toast.show();
+
+        UploadSchiggAsyncTask task = new UploadSchiggAsyncTask();
+        task.execute(schigg);
+
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
 
+    private class UploadSchiggAsyncTask extends AsyncTask<ISchigg, Void, Void>{
 
+        @Override
+        protected Void doInBackground(ISchigg... schiggs) {
+            // TODO call webservice and save Schigg
+
+            // TODO remove sleep - only for simulating net-delay
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            Toast toast = Toast.makeText(getApplicationContext(), "Danke, dein Beitrag wurde hochgeladen", Toast.LENGTH_LONG);
+            toast.show();
+        }
+    }
 }

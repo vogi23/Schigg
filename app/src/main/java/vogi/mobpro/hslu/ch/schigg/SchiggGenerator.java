@@ -8,6 +8,8 @@ import vogi.mobpro.hslu.ch.schigg.business.ISchigg;
 import vogi.mobpro.hslu.ch.schigg.business.Schigg;
 
 /**
+ * This class is used only as a placeholder for the webservice.
+ *
  * Created by tgdvoch5 on 18.04.2015.
  */
 public class SchiggGenerator {
@@ -44,6 +46,11 @@ public class SchiggGenerator {
     }
 
     public static List<ISchigg> generateSchiggs(int amount){
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         List<ISchigg> list = new ArrayList<>();
         for(int i = 0; i < amount;i++){
             ISchigg s = new Schigg();

@@ -3,6 +3,7 @@ package vogi.mobpro.hslu.ch.schigg;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,42 +12,39 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import vogi.mobpro.hslu.ch.schigg.business.ISchigg;
-import vogi.mobpro.hslu.ch.schigg.business.Schigg;
-import vogi.mobpro.hslu.ch.schigg.http.OnSwipeTouchListener;
 
 
 public class MainActivity extends Activity{
 
-    private final String PREF_KEY_ACTUAL_SCHIGG_ID = "actual_schigg_id";
-    private int actualSchiggIndex;
+    private final String PREF_KEY_ACTUAL_SCHIGG_INDEX = "actual_schigg_index"; // Persist position of Scroller while MainAcitvity is destroyed.
+
     private SchiggLinkedList schiggList;
+    private boolean isLoading = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SharedPreferences prefs = getPreferences(MODE_PRIVATE);
-        this.actualSchiggIndex = prefs.getInt(PREF_KEY_ACTUAL_SCHIGG_ID, 0);
-
+        // Get cached list for scroller
         LocalSchiggCache cache = LocalSchiggCache.getInstance();
         this.schiggList = cache.getCachedList();
-        if(this.schiggList == null){
-            Intent intent = new Intent(this, WelcomeActivity.class);
+        if(this.schiggList == null) {
+            // If no cached list, Load initial list from webservice
+            Intent intent = new Intent(this, LoadingActivity.class);
             startActivity(intent);
             return;
         }
 
-        this.schiggList.get(this.actualSchiggIndex);
-        syncScrollerToList();
+        // Retrive last position of Scroller
+        SharedPreferences prefs = getPreferences(MODE_PRIVATE);
+        int actualSchiggIndex = prefs.getInt(PREF_KEY_ACTUAL_SCHIGG_INDEX, 0);
 
-        // Swipe Listener
+        // Swipe Listener for Scroller
         RelativeLayout view = (RelativeLayout) findViewById(R.id.main_container);
         view.setOnTouchListener(new OnSwipeTouchListener(this) {
             @Override
@@ -59,43 +57,89 @@ public class MainActivity extends Activity{
                 MainActivity.this.rotateRight();
             }
         });
+
+        this.schiggList.get(actualSchiggIndex);
+        syncScrollerToList();
     }
 
-
-
+    /**
+     * Rotate scroller to the right - display next OLDER Schigg.
+     */
     private void rotateRight(){
         ISchigg schigg = schiggList.previous();
         if(schigg != null){
             syncScrollerToList();
-        }else{
+        }else if(this.isLoading == false){
+            this.isLoading = true;
             Button buttonRight = (Button) findViewById(R.id.btn_rotateRight);
             ProgressBar barRight = (ProgressBar) findViewById(R.id.progress_rotateRight);
             buttonRight.setVisibility(View.GONE);
             barRight.setVisibility(View.VISIBLE);
-            this.appendLeft(SchiggGenerator.generateSchiggs(3));
-            buttonRight.setVisibility(View.VISIBLE);
-            barRight.setVisibility(View.GONE);
-            schiggList.previous();
-            syncScrollerToList();
+            LoadMoreSchiggsAsyncTask task = new LoadMoreSchiggsAsyncTask();
+            task.execute(1,5);
         }
     }
 
+    /**
+     * Rotate scroller to the left - display next NEWER Schigg.
+     */
     private void rotateLeft(){
         ISchigg schigg = schiggList.next();
         if(schigg != null){
             syncScrollerToList();
-        }else{
+        }else if(this.isLoading == false){
+            this.isLoading = true;
             Button buttonLeft = (Button) findViewById(R.id.btn_rotateLeft);
             ProgressBar barLeft = (ProgressBar) findViewById(R.id.progress_rotateLeft);
             buttonLeft.setVisibility(View.GONE);
             barLeft.setVisibility(View.VISIBLE);
-            this.appendRight(SchiggGenerator.generateSchiggs(3));
-            buttonLeft.setVisibility(View.VISIBLE);
-            barLeft.setVisibility(View.GONE);
-            schiggList.next();
-            syncScrollerToList();
+            LoadMoreSchiggsAsyncTask task = new LoadMoreSchiggsAsyncTask();
+            task.execute(0, 5);
         }
     }
+
+    private class LoadMoreSchiggsAsyncTask extends AsyncTask<Integer, Void, Void> {
+
+        private boolean newer;
+
+        @Override
+        protected Void doInBackground(Integer... integers) {
+            this.newer = integers.length > 0 && integers[0] == 1;
+            int numof = integers.length > 1 ? integers[1] : 3;
+
+            // TODO remove - only for simulating net-delay
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            if(newer){
+                // TODO call Webservice instead of SchiggGenerator - get max "numof" newer schiggs
+                MainActivity.this.schiggList.addAllLeft(SchiggGenerator.generateSchiggs(numof));
+            }else{
+                // TODO call Webservice instead of SchiggGenerator - get max "numof" older schiggs
+                MainActivity.this.schiggList.addAllRight(SchiggGenerator.generateSchiggs(numof));
+            }
+            LocalSchiggCache cache = LocalSchiggCache.getInstance();
+            cache.setCachedList(MainActivity.this.schiggList);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if(this.newer) {
+                MainActivity.this.schiggList.previous();
+            }else{
+                MainActivity.this.schiggList.next();
+            }
+            syncScrollerToList();
+            MainActivity.this.isLoading = false;
+        }
+    }
+
+
 
     private void appendLeft(List<ISchigg> list){
         schiggList.addAllLeft(list);
@@ -104,7 +148,9 @@ public class MainActivity extends Activity{
         schiggList.addAllRight(list);
     }
 
-
+    /**
+     * Displays Schigg at current position of SchiggLinkedList and updates scrolling-buttons-visibility.
+     */
     private void syncScrollerToList(){
         ISchigg schigg = this.schiggList.current();
         TextView wortText = (TextView) findViewById(R.id.schiggScrollerWort);
@@ -127,6 +173,11 @@ public class MainActivity extends Activity{
         }else{
             btnLeft.setVisibility(View.VISIBLE);
         }
+
+        ProgressBar barLeft = (ProgressBar) findViewById(R.id.progress_rotateLeft);
+        ProgressBar barRight = (ProgressBar) findViewById(R.id.progress_rotateRight);
+        barLeft.setVisibility(View.GONE);
+        barRight.setVisibility(View.GONE);
     }
 
 
@@ -152,24 +203,37 @@ public class MainActivity extends Activity{
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * onclick Callback of btn id/btn_add_wort in main_activity layout.
+     * @param v
+     */
     public void btn_newWort(View v){
         Intent intent = new Intent(this, SchiggFormActivity.class);
         startActivity(intent);
     }
+
+    /**
+     * onclick Callback of btn id/btn_rotateRight in main_activity layout.
+     * @param v
+     */
+    public void btn_rotateRight(View v){
+        this.rotateRight();
+    }
+    /**
+     * onclick Callback of btn id/btn_rotateLeft in main_activity layout.
+     * @param v
+     */
+    public void btn_rotateLeft(View v){
+        this.rotateLeft();
+    }
+
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         SharedPreferences prefs = getPreferences(MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putInt(PREF_KEY_ACTUAL_SCHIGG_ID, this.actualSchiggIndex);
+        editor.putInt(PREF_KEY_ACTUAL_SCHIGG_INDEX, this.schiggList.currentIndex());
         editor.apply();
-    }
-
-    public void btn_rotateRight(View v){
-        this.rotateRight();
-    }
-    public void btn_rotateLeft(View v){
-        this.rotateLeft();
     }
 }

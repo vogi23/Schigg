@@ -3,6 +3,7 @@ package vogi.mobpro.hslu.ch.schigg;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,6 +16,7 @@ import android.widget.Toast;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import vogi.mobpro.hslu.ch.schigg.business.SpecialChar;
 import vogi.mobpro.hslu.ch.schigg.business.SpecialCharVariant;
@@ -68,7 +70,7 @@ public class SpecialCharActivity extends Activity implements AdapterView.OnItemC
         this.actCharArray = this.charMap.get(b.getText());
     }
 
-    public void setVariants(SpecialCharVariant[] items){
+    public void setVariants(final SpecialCharVariant[] items){
         ArrayAdapter<SpecialCharVariant> adapter = new ArrayAdapter<SpecialCharVariant>(this, R.layout.specialchar_list_item, items);
         ListView listView = (ListView) findViewById(R.id.specialCharListView);
         listView.setAdapter(adapter);

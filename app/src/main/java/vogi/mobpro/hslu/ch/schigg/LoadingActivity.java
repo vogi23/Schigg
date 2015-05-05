@@ -6,19 +6,19 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 
+public class LoadingActivity extends Activity {
 
-public class WelcomeActivity extends Activity {
+    private static final int NUM_OF_INITIALLY_LOADED_SCHIGGS = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
+
+        // Randomly show one of the welcome images
         ImageView image = (ImageView) findViewById(R.id.welcome_image);
         double rand = Math.random();
         int res_id;
@@ -31,33 +31,36 @@ public class WelcomeActivity extends Activity {
         }
         image.setImageResource(res_id);
 
-        startWaitAysnc();
+        loadInitalSchiggs();
     }
 
 
-    public void startWaitAysnc(){
-        WaitAsyncTask task = new WaitAsyncTask();
+    public void loadInitalSchiggs(){
+        LoadInitalListAsyncTask task = new LoadInitalListAsyncTask();
         task.execute();
     }
 
-    private class WaitAsyncTask extends AsyncTask<Void, Void, Void>{
+    private class LoadInitalListAsyncTask extends AsyncTask<Void, Void, Void>{
 
         @Override
         protected Void doInBackground(Void... voids) {
+            // TODO call webservice instead of SchiggGenerator
+            LocalSchiggCache cache = LocalSchiggCache.getInstance();
+            cache.setCachedList(new SchiggLinkedList(SchiggGenerator.generateSchiggs(NUM_OF_INITIALLY_LOADED_SCHIGGS)));
+
+            // TODO remove sleep - only for simulating net-delay
             try {
-                Thread.sleep(2000);
+                Thread.sleep(1500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            LocalSchiggCache cache = LocalSchiggCache.getInstance();
-            cache.setCachedList(new SchiggLinkedList(SchiggGenerator.generateSchiggs(5)));
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            Intent intent = new Intent(WelcomeActivity.this, MainActivity.class);
+            Intent intent = new Intent(LoadingActivity.this, MainActivity.class);
             startActivity(intent);
         }
     }

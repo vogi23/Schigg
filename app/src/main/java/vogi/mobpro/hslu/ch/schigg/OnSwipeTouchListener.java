@@ -1,4 +1,4 @@
-package vogi.mobpro.hslu.ch.schigg.http;
+package vogi.mobpro.hslu.ch.schigg;
 
 import android.content.Context;
 import android.view.GestureDetector;
