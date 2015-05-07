@@ -179,11 +179,11 @@ public class SchiggFormActivity extends Activity {
                 httpURLConnection.setUseCaches(false);
                 DataOutputStream wr = new DataOutputStream( httpURLConnection.getOutputStream());
                 wr.write( postData );
-
+                int responseCode = httpURLConnection.getResponseCode();
+                this.saved = httpURLConnection.getResponseCode() == 201;
             } catch (IOException e) {
                 return null;
             }
-            this.saved = true;
             return null;
         }
 
