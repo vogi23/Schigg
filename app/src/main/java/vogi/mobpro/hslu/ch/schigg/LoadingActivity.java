@@ -70,11 +70,14 @@ public class LoadingActivity extends Activity {
             HttpURLConnection httpURLConnection = null;
             InputStream in;
             try {
-                urlx = new URL("http://vgbau.ch/json.htm");
+                urlx = new URL(getResources().getString(R.string.url) + "?$top=" + numof + "&$orderby=Id desc");
+                //urlx = new URL(getResources().getString(R.string.url));
+
                 httpURLConnection = (HttpURLConnection) urlx.openConnection();
                 httpURLConnection.setAllowUserInteraction(false);
                 httpURLConnection.setInstanceFollowRedirects(true);
                 httpURLConnection.setRequestMethod("GET");
+                httpURLConnection.connect();
                 in = httpURLConnection.getInputStream();
             } catch (MalformedURLException e) {
                 return null;
@@ -87,10 +90,14 @@ public class LoadingActivity extends Activity {
             try {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(in));
                 String text = reader.readLine();
+                String jsonString = "";
+                while (text != null) {
+                    jsonString += text;
+                    text = reader.readLine();
+                }
                 in.close();
 
-                JSONArray json = null;
-                JSONObject mainO = new JSONObject(text);
+                JSONObject mainO = new JSONObject(jsonString);
                 JSONArray schiggArray = mainO.getJSONArray("value");
                 for (int i = 0 ; i < schiggArray.length(); i++) {
                     JSONObject schiggO = schiggArray.getJSONObject(i);

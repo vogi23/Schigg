@@ -63,13 +63,6 @@ public class MainActivity extends Activity{
 
 
 
-
-
-
-
-
-
-
         // Retrive last position of Scroller
         SharedPreferences prefs = getPreferences(MODE_PRIVATE);
         int actualSchiggIndex = prefs.getInt(PREF_KEY_ACTUAL_SCHIGG_INDEX, 0);
@@ -106,7 +99,7 @@ public class MainActivity extends Activity{
             buttonRight.setVisibility(View.GONE);
             barRight.setVisibility(View.VISIBLE);
             LoadMoreSchiggsAsyncTask task = new LoadMoreSchiggsAsyncTask();
-            task.execute(1,5);
+            task.execute(1,schiggList.current().getID(), 5);
         }
     }
 
@@ -124,7 +117,7 @@ public class MainActivity extends Activity{
             buttonLeft.setVisibility(View.GONE);
             barLeft.setVisibility(View.VISIBLE);
             LoadMoreSchiggsAsyncTask task = new LoadMoreSchiggsAsyncTask();
-            task.execute(2, 5);
+            task.execute(2, schiggList.current().getID());
         }
     }
 
@@ -138,9 +131,8 @@ public class MainActivity extends Activity{
             int id = integers.length > 1 ? integers[1] : 1;
             int numof = integers.length > 2 ? integers[2] : 5;
 
-            //String[] urls = {   "localhost/schigg?$orderby=id asc&$top=5&$filter=id gt '44'",
-            //                    "localhost/schigg?$orderby=id desc&$top=5&$filter=id lt '44'"};
-            String[] urls = {   "http://vgbau.ch/json.htm","http://vgbau.ch/json.htm"};
+            String[] urls = { getResources().getString(R.string.url) + "?$orderby=id asc&$top=" + numof + "&$filter=id gt " + id,
+                              getResources().getString(R.string.url ) + "?$orderby=id desc&$top=" + numof + "&$filter=id lt " + id};
 
             String url = newer ? urls[0] : urls[1];
 

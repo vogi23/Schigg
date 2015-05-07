@@ -167,7 +167,7 @@ public class SchiggFormActivity extends Activity {
             HttpURLConnection httpURLConnection = null;
             InputStream in;
             try {
-                urlx = new URL("http://vgbau.ch/json.htm");
+                urlx = new URL(getResources().getString(R.string.url));
                 httpURLConnection = (HttpURLConnection) urlx.openConnection();
                 httpURLConnection.setDoOutput(true);
                 httpURLConnection.setDoInput(true);
