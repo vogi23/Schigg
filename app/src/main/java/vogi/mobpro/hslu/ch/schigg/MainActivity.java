@@ -13,9 +13,29 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import vogi.mobpro.hslu.ch.schigg.business.ISchigg;
+import vogi.mobpro.hslu.ch.schigg.business.Schigg;
 
 
 public class MainActivity extends Activity{
@@ -40,6 +60,16 @@ public class MainActivity extends Activity{
             return;
         }
 
+
+
+
+
+
+
+
+
+
+
         // Retrive last position of Scroller
         SharedPreferences prefs = getPreferences(MODE_PRIVATE);
         int actualSchiggIndex = prefs.getInt(PREF_KEY_ACTUAL_SCHIGG_INDEX, 0);
@@ -63,7 +93,7 @@ public class MainActivity extends Activity{
     }
 
     /**
-     * Rotate scroller to the right - display next OLDER Schigg.
+     * Rotate scroller to the right - display next NEWER Schigg.
      */
     private void rotateRight(){
         ISchigg schigg = schiggList.previous();
@@ -81,7 +111,7 @@ public class MainActivity extends Activity{
     }
 
     /**
-     * Rotate scroller to the left - display next NEWER Schigg.
+     * Rotate scroller to the left - display next OLDER Schigg.
      */
     private void rotateLeft(){
         ISchigg schigg = schiggList.next();
@@ -94,7 +124,7 @@ public class MainActivity extends Activity{
             buttonLeft.setVisibility(View.GONE);
             barLeft.setVisibility(View.VISIBLE);
             LoadMoreSchiggsAsyncTask task = new LoadMoreSchiggsAsyncTask();
-            task.execute(0, 5);
+            task.execute(2, 5);
         }
     }
 
@@ -105,22 +135,68 @@ public class MainActivity extends Activity{
         @Override
         protected Void doInBackground(Integer... integers) {
             this.newer = integers.length > 0 && integers[0] == 1;
-            int numof = integers.length > 1 ? integers[1] : 3;
+            int id = integers.length > 1 ? integers[1] : 1;
+            int numof = integers.length > 2 ? integers[2] : 5;
 
-            // TODO remove - only for simulating net-delay
+            //String[] urls = {   "localhost/schigg?$orderby=id asc&$top=5&$filter=id gt '44'",
+            //                    "localhost/schigg?$orderby=id desc&$top=5&$filter=id lt '44'"};
+            String[] urls = {   "http://vgbau.ch/json.htm","http://vgbau.ch/json.htm"};
+
+            String url = newer ? urls[0] : urls[1];
+
+            List<ISchigg> newschiggs = new ArrayList<>();
+
+            URL urlx = null;
+            HttpURLConnection httpURLConnection = null;
+            InputStream in;
             try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
+                urlx = new URL(url);
+                httpURLConnection = (HttpURLConnection) urlx.openConnection();
+                httpURLConnection.setAllowUserInteraction(false);
+                httpURLConnection.setInstanceFollowRedirects(true);
+                httpURLConnection.setRequestMethod("GET");
+                in = httpURLConnection.getInputStream();
+            } catch (MalformedURLException e) {
+                return null;
+            } catch (ProtocolException e) {
+                return null;
+            } catch (IOException e) {
+                return null;
+            }
+
+            try {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                String text = reader.readLine();
+                in.close();
+
+                JSONArray json = null;
+                JSONObject mainO = new JSONObject(text);
+                JSONArray schiggArray = mainO.getJSONArray("value");
+                for (int i = 0 ; i < schiggArray.length(); i++) {
+                    JSONObject schiggO = schiggArray.getJSONObject(i);
+                    int schiggId = schiggO.getInt("Id");
+                    String wort = schiggO.getString("Wort");
+                    String beschribig = schiggO.getString("Beschribig");
+                    String plz = schiggO.getString("PoschtLeitZau");
+                    ISchigg schigg = new Schigg(schiggId);
+                    schigg.setWort(wort);
+                    schigg.setBeschribig(beschribig);
+                    schigg.setPLZ(plz);
+                    newschiggs.add(schigg);
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
 
             if(newer){
-                // TODO call Webservice instead of SchiggGenerator - get max "numof" newer schiggs
-                MainActivity.this.schiggList.addAllLeft(SchiggGenerator.generateSchiggs(numof));
+                MainActivity.this.schiggList.addAllLeft(newschiggs);
             }else{
-                // TODO call Webservice instead of SchiggGenerator - get max "numof" older schiggs
-                MainActivity.this.schiggList.addAllRight(SchiggGenerator.generateSchiggs(numof));
+                MainActivity.this.schiggList.addAllRight(newschiggs);
             }
+
             LocalSchiggCache cache = LocalSchiggCache.getInstance();
             cache.setCachedList(MainActivity.this.schiggList);
             return null;

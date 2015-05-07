@@ -8,6 +8,24 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+import vogi.mobpro.hslu.ch.schigg.business.ISchigg;
+import vogi.mobpro.hslu.ch.schigg.business.Schigg;
+
 
 public class LoadingActivity extends Activity {
 
@@ -37,23 +55,64 @@ public class LoadingActivity extends Activity {
 
     public void loadInitalSchiggs(){
         LoadInitalListAsyncTask task = new LoadInitalListAsyncTask();
-        task.execute();
+        task.execute(NUM_OF_INITIALLY_LOADED_SCHIGGS);
     }
 
-    private class LoadInitalListAsyncTask extends AsyncTask<Void, Void, Void>{
+    private class LoadInitalListAsyncTask extends AsyncTask<Integer, Void, Void>{
 
         @Override
-        protected Void doInBackground(Void... voids) {
-            // TODO call webservice instead of SchiggGenerator
-            LocalSchiggCache cache = LocalSchiggCache.getInstance();
-            cache.setCachedList(new SchiggLinkedList(SchiggGenerator.generateSchiggs(NUM_OF_INITIALLY_LOADED_SCHIGGS)));
+        protected Void doInBackground(Integer... integers) {
+            int numof = integers.length > 0 ? integers[0] : 5;
 
-            // TODO remove sleep - only for simulating net-delay
+            List<ISchigg> newschiggs = new ArrayList<>();
+
+            URL urlx = null;
+            HttpURLConnection httpURLConnection = null;
+            InputStream in;
             try {
-                Thread.sleep(1500);
-            } catch (InterruptedException e) {
+                urlx = new URL("http://vgbau.ch/json.htm");
+                httpURLConnection = (HttpURLConnection) urlx.openConnection();
+                httpURLConnection.setAllowUserInteraction(false);
+                httpURLConnection.setInstanceFollowRedirects(true);
+                httpURLConnection.setRequestMethod("GET");
+                in = httpURLConnection.getInputStream();
+            } catch (MalformedURLException e) {
+                return null;
+            } catch (ProtocolException e) {
+                return null;
+            } catch (IOException e) {
+                return null;
+            }
+
+            try {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                String text = reader.readLine();
+                in.close();
+
+                JSONArray json = null;
+                JSONObject mainO = new JSONObject(text);
+                JSONArray schiggArray = mainO.getJSONArray("value");
+                for (int i = 0 ; i < schiggArray.length(); i++) {
+                    JSONObject schiggO = schiggArray.getJSONObject(i);
+                    int schiggId = schiggO.getInt("Id");
+                    String wort = schiggO.getString("Wort");
+                    String beschribig = schiggO.getString("Beschribig");
+                    String plz = schiggO.getString("PoschtLeitZau");
+                    ISchigg schigg = new Schigg(schiggId);
+                    schigg.setWort(wort);
+                    schigg.setBeschribig(beschribig);
+                    schigg.setPLZ(plz);
+                    newschiggs.add(schigg);
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
+
+            LocalSchiggCache cache = LocalSchiggCache.getInstance();
+            cache.setCachedList(new SchiggLinkedList(newschiggs));
             return null;
         }
 

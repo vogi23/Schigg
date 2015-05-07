@@ -15,6 +15,23 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+
 import vogi.mobpro.hslu.ch.schigg.business.ISchigg;
 import vogi.mobpro.hslu.ch.schigg.business.Schigg;
 
@@ -122,24 +139,59 @@ public class SchiggFormActivity extends Activity {
 
     private class UploadSchiggAsyncTask extends AsyncTask<ISchigg, Void, Void>{
 
+        private boolean saved = false;
+
         @Override
         protected Void doInBackground(ISchigg... schiggs) {
-            // TODO call webservice and save Schigg
 
-            // TODO remove sleep - only for simulating net-delay
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            ISchigg schigg;
+            if(schiggs.length > 0){
+                schigg = schiggs[0];
+            }else{
+                return null;
             }
 
+            JSONObject jsonO = new JSONObject();
+            try {
+                jsonO.put("Wort", schigg.getWort());
+                jsonO.put("Beschribig", schigg.getBeschribig());
+                jsonO.put("PoschtLeitZau", schigg.getPLZ());
+            } catch (JSONException e) {
+                return null;
+            }
+
+            byte[] postData = jsonO.toString().getBytes();
+            int    postDataLength = postData.length;
+
+            URL urlx = null;
+            HttpURLConnection httpURLConnection = null;
+            InputStream in;
+            try {
+                urlx = new URL("http://vgbau.ch/json.htm");
+                httpURLConnection = (HttpURLConnection) urlx.openConnection();
+                httpURLConnection.setDoOutput(true);
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.setInstanceFollowRedirects(true);
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setRequestProperty("Content-Type", "application/json");
+                httpURLConnection.setRequestProperty("charset", "utf-8");
+                httpURLConnection.setRequestProperty("Content-Length", Integer.toString(postDataLength));
+                httpURLConnection.setUseCaches(false);
+                DataOutputStream wr = new DataOutputStream( httpURLConnection.getOutputStream());
+                wr.write( postData );
+
+            } catch (IOException e) {
+                return null;
+            }
+            this.saved = true;
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            Toast toast = Toast.makeText(getApplicationContext(), "Danke, dein Beitrag wurde hochgeladen", Toast.LENGTH_LONG);
+            String s = this.saved ? "Danke, dein Beitrag wurde hochgeladen" : "faiiiiiiiil";
+            Toast toast = Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG);
             toast.show();
         }
     }
