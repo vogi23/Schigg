@@ -147,6 +147,7 @@ public class MainActivity extends Activity{
                 httpURLConnection.setAllowUserInteraction(false);
                 httpURLConnection.setInstanceFollowRedirects(true);
                 httpURLConnection.setRequestMethod("GET");
+                httpURLConnection.connect();
                 in = httpURLConnection.getInputStream();
             } catch (MalformedURLException e) {
                 return null;
