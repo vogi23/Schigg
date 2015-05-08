@@ -2,34 +2,23 @@ package vogi.mobpro.hslu.ch.schigg;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.AsyncTask;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 import vogi.mobpro.hslu.ch.schigg.business.ISchigg;
-import vogi.mobpro.hslu.ch.schigg.business.Schigg;
+import vogi.mobpro.hslu.ch.schigg.vogi.mobpro.hslu.ch.schigg.dataaccess.LoadSchigg;
 
 
-public class LoadingActivity extends Activity {
+public class LoadingActivity extends Activity implements LoadedSchiggHandler {
 
-    private static final int NUM_OF_INITIALLY_LOADED_SCHIGGS = 10;
+    private static final Integer NUM_OF_INITIALLY_LOADED_SCHIGGS = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,81 +43,27 @@ public class LoadingActivity extends Activity {
 
 
     public void loadInitalSchiggs(){
-        LoadInitalListAsyncTask task = new LoadInitalListAsyncTask();
-        task.execute(NUM_OF_INITIALLY_LOADED_SCHIGGS);
+        String uri = Uri.parse(getResources().getString(R.string.url))
+                .buildUpon()
+                .appendQueryParameter("$top", NUM_OF_INITIALLY_LOADED_SCHIGGS.toString())
+                .appendQueryParameter("$orderby", "Id desc")
+                .build().toString();
+        URL urlx = null;
+        try {
+            urlx = new URL(uri);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        LoadSchigg task = new LoadSchigg(this);
+        task.execute(urlx);
     }
 
-    private class LoadInitalListAsyncTask extends AsyncTask<Integer, Void, Void>{
-
-        @Override
-        protected Void doInBackground(Integer... integers) {
-            int numof = integers.length > 0 ? integers[0] : 5;
-
-            List<ISchigg> newschiggs = new ArrayList<>();
-
-            URL urlx = null;
-            HttpURLConnection httpURLConnection = null;
-            InputStream in;
-            try {
-                urlx = new URL(getResources().getString(R.string.url) + "?$top=" + numof + "&$orderby=Id desc");
-                //urlx = new URL(getResources().getString(R.string.url));
-
-                httpURLConnection = (HttpURLConnection) urlx.openConnection();
-                httpURLConnection.setAllowUserInteraction(false);
-                httpURLConnection.setInstanceFollowRedirects(true);
-                httpURLConnection.setRequestMethod("GET");
-                httpURLConnection.connect();
-                in = httpURLConnection.getInputStream();
-            } catch (MalformedURLException e) {
-                return null;
-            } catch (ProtocolException e) {
-                return null;
-            } catch (IOException e) {
-                return null;
-            }
-
-            try {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                String text = reader.readLine();
-                String jsonString = "";
-                while (text != null) {
-                    jsonString += text;
-                    text = reader.readLine();
-                }
-                in.close();
-
-                JSONObject mainO = new JSONObject(jsonString);
-                JSONArray schiggArray = mainO.getJSONArray("value");
-                for (int i = 0 ; i < schiggArray.length(); i++) {
-                    JSONObject schiggO = schiggArray.getJSONObject(i);
-                    int schiggId = schiggO.getInt("Id");
-                    String wort = schiggO.getString("Wort");
-                    String beschribig = schiggO.getString("Beschribig");
-                    String plz = schiggO.getString("PoschtLeitZau");
-                    ISchigg schigg = new Schigg(schiggId);
-                    schigg.setWort(wort);
-                    schigg.setBeschribig(beschribig);
-                    schigg.setPLZ(plz);
-                    newschiggs.add(schigg);
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            LocalSchiggCache cache = LocalSchiggCache.getInstance();
-            cache.setCachedList(new SchiggLinkedList(newschiggs));
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            Intent intent = new Intent(LoadingActivity.this, MainActivity.class);
-            startActivity(intent);
-        }
+    @Override
+    public void handleSchiggs(List<ISchigg> loadedSchigg) {
+        LocalSchiggCache cache = LocalSchiggCache.getInstance();
+        cache.setCachedList(new SchiggLinkedList(loadedSchigg));
+        Intent intent = new Intent(LoadingActivity.this, MainActivity.class);
+        startActivity(intent);
     }
 
     @Override

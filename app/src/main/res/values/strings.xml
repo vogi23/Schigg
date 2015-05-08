@@ -6,5 +6,5 @@
     <string name="title_activity_schigg_form">SchiggFormActivity</string>
     <string name="title_activity_special_char">SpecialCharActivity</string>
     <string name="title_activity_welcome">WelcomeActivity</string>
-    <string name="url">http://10.0.2.2/Schigg/api/Schigg/</string>
+    <string name="url">http://10.0.2.2/Schigg/api/Schigg</string>
 </resources>

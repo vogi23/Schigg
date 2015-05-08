@@ -124,8 +124,8 @@ public class SchiggFormActivity extends Activity {
         EditText plzText = (EditText) findViewById(R.id.newschiggPLZInput);
         ISchigg schigg = new Schigg();
         schigg.setWort(wortText.getText().toString());
-        schigg.setWort(beschribigText.getText().toString());
-        schigg.setWort(plzText.getText().toString());
+        schigg.setBeschribig(beschribigText.getText().toString());
+        schigg.setPLZ(plzText.getText().toString());
 
         Toast toast = Toast.makeText(getApplicationContext(), "Beitrag wird hochgeladen...", Toast.LENGTH_SHORT);
         toast.show();
@@ -179,8 +179,9 @@ public class SchiggFormActivity extends Activity {
                 httpURLConnection.setUseCaches(false);
                 DataOutputStream wr = new DataOutputStream( httpURLConnection.getOutputStream());
                 wr.write( postData );
-                int responseCode = httpURLConnection.getResponseCode();
-                this.saved = httpURLConnection.getResponseCode() == 201;
+                Integer statusCode = httpURLConnection.getResponseCode();
+                Object content = httpURLConnection.getContent();
+                this.saved = statusCode == 201;
             } catch (IOException e) {
                 return null;
             }
